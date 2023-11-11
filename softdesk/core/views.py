@@ -41,7 +41,11 @@ class IssueViewset(ModelViewSet):
             project=project, user=self.request.user
         ).exists()
         print(project, assign_to)
-        print("----------------->", is_authenticated_user_contributor, is_assigned_user_contributor)
+        print(
+            "----------------->",
+            is_authenticated_user_contributor,
+            is_assigned_user_contributor,
+        )
 
         if is_assigned_user_contributor and is_authenticated_user_contributor:
             serializer.save()

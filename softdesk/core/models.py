@@ -1,8 +1,9 @@
 import uuid
 
-from authentication.models import User
 from django.db import models
 from django.db.models import UUIDField
+
+from authentication.models import User
 
 
 class Project(models.Model):
@@ -55,7 +56,7 @@ class Issue(models.Model):
         related_name="issues",
     )
     assign_to = models.ForeignKey(
-        Contributor, on_delete=models.SET_NULL , null=True, related_name='issue_assigned'
+        Contributor, on_delete=models.SET_NULL, null=True, related_name="issue_assigned"
     )
 
     def __str__(self):
