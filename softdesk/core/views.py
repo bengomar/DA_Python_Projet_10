@@ -2,19 +2,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from .models import Comment, Contributor, Issue, Project
-from .permissions import IsAuthor, IsContributor, IsIssueContributor
-from .serializers import (
-    CommentSerializer,
-    ContributorSerializer,
-    IssueSerializer,
-    ProjectSerializer,
-)
+from .permissions import (IsAuthor, IsProjectContributor,
+                          IsProjectContributorRelatedIssue)
+from .serializers import (CommentSerializer, ContributorSerializer,
+                          IssueSerializer, ProjectSerializer)
 
 
 class ProjectViewset(ModelViewSet):
     serializer_class = ProjectSerializer
     queryset = Project.objects.all()
-    permission_classes = [IsAuthenticated, IsContributor]
+    permission_classes = [IsAuthenticated, IsProjectContributor, IsAuthor]
 
     def perform_create(self, serializer):
         new_project = serializer.save(author=self.request.user)
@@ -24,11 +21,15 @@ class ProjectViewset(ModelViewSet):
 class IssueViewset(ModelViewSet):
     serializer_class = IssueSerializer
     queryset = Issue.objects.all()
-    permission_classes = [IsAuthenticated, IsIssueContributor, IsAuthor]
+    permission_classes = [IsAuthenticated, IsProjectContributorRelatedIssue]
+
+    def get_queryset(self):
+        project_id = self.kwargs["id_project"]
+        return Issue.objects.filter(project=project_id)
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-        # Contributor.objects.create(project=new_issue.project, user=self.request.user)
+        project_id = self.kwargs["id_project"]
+        serializer.save(author=self.request.user, project_id=project_id)
 
     def perform_update(self, serializer):
         current_issue = serializer.instance
@@ -40,12 +41,6 @@ class IssueViewset(ModelViewSet):
         is_authenticated_user_contributor = Contributor.objects.filter(
             project=project, user=self.request.user
         ).exists()
-        print(project, assign_to)
-        print(
-            "----------------->",
-            is_authenticated_user_contributor,
-            is_assigned_user_contributor,
-        )
 
         if is_assigned_user_contributor and is_authenticated_user_contributor:
             serializer.save()
@@ -54,10 +49,13 @@ class IssueViewset(ModelViewSet):
 class CommentViewset(ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
-    permission_classes = [IsAuthenticated, IsAuthor]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        url_issue_id = self.kwargs["id_issue"]
+        return Comment.objects.filter(issue=url_issue_id)
 
     def perform_create(self, serializer):
-        # Pass the authenticated user to the serializer during creation
         serializer.save(author=self.request.user)
 
 

@@ -48,3 +48,9 @@ python manage.py migrate
 ```
 python manage.py runserver
 ```
+
+### Collection Postman permettant de requèter l'API:
+    
+Le fichier json de collections Postman 'SoftDesk.postman_collection.json' est à importer depuis Postman.
+
+[SoftDesk.postman_collection.json](./SoftDesk.postman_collection.json)

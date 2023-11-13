@@ -1,9 +1,8 @@
 import uuid
 
+from authentication.models import User
 from django.db import models
 from django.db.models import UUIDField
-
-from authentication.models import User
 
 
 class Project(models.Model):
@@ -22,7 +21,7 @@ class Project(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.title} (author: {self.author})"
 
 
 class Contributor(models.Model):
@@ -31,6 +30,9 @@ class Contributor(models.Model):
     )
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.id}"
 
 
 class Issue(models.Model):
@@ -53,6 +55,7 @@ class Issue(models.Model):
     project = models.ForeignKey(
         Project,
         on_delete=models.PROTECT,  # On ne permet pas la suppression d'un projet ici !
+        null=True,
         related_name="issues",
     )
     assign_to = models.ForeignKey(

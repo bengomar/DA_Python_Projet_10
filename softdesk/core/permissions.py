@@ -1,9 +1,9 @@
 from rest_framework.permissions import BasePermission
 
-from .models import Contributor, Issue
+from .models import Contributor
 
 
-class IsContributor(BasePermission):
+class IsProjectContributor(BasePermission):
     """
     Vérifie si l'utilisateur connecté est contributeur sur le projet
     """
@@ -12,13 +12,14 @@ class IsContributor(BasePermission):
         return Contributor.objects.filter(project=obj, user=request.user).exists()
 
 
-class IsIssueContributor(BasePermission):
+class IsProjectContributorRelatedIssue(BasePermission):
     """
     Vérifie si l'utilisateur connecté est contributeur sur le projet de l'issue
+    pour pouvoir accéder aux détails de l'issue
     """
 
-    # Verifier si je suis contributeur d'un projet pour une issue précise
     def has_object_permission(self, request, view, obj):
+        print("IsIssueContributor exists ----->", obj.project, request.user)
         return Contributor.objects.filter(
             project=obj.project, user=request.user
         ).exists()
@@ -27,21 +28,8 @@ class IsIssueContributor(BasePermission):
 class IsAuthor(BasePermission):
     def has_object_permission(self, request, view, obj):
         """
-        Si la requète est de type PUT, PATCH ou DELETE
         renvoie True si l'utilisateur connecté est l'auteur de l'objet
         """
-        if request.method in ["PUT", "PATCH", "DELETE"]:
-            if obj.author == request.user:
-                return True
-            return False
-        return True
-
-
-class IsProjetContributor(BasePermission):
-    """
-    Vérifie si l'utilisateur connecté est contributeur sur le projet
-    """
-
-    # Doit etre contributeur du projet
-    def has_object_permission(self, request, view, obj):
-        return Contributor.objects.filter(project=obj, user=request.user).exists()
+        if obj.author.id == request.user.id:
+            return True
+        return False

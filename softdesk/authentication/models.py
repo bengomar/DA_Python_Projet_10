@@ -3,7 +3,9 @@ from django.db import models
 
 
 class User(AbstractUser):
-    """User model"""
+    """
+    User model
+    """
 
     age = models.PositiveIntegerField()
     can_be_contacted = models.BooleanField(default=True)

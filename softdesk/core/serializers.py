@@ -31,7 +31,7 @@ class ContributorSerializer(ModelSerializer):
     class Meta:
         model = Contributor
         fields = ["id", "user", "project", "date_created"]
-        read_only_fields = ["id", "user", "project", "date_created"]
+        read_only_fields = ["id", "date_created"]
 
 
 class ProjectSerializer(ModelSerializer):
