@@ -19,7 +19,6 @@ class IsProjectContributorRelatedIssue(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        print("IsIssueContributor exists ----->", obj.project, request.user)
         return Contributor.objects.filter(
             project=obj.project, user=request.user
         ).exists()
